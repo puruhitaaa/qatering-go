@@ -1,19 +1,13 @@
 "use client"
 
 import Autoplay from "embla-carousel-autoplay"
-import { ArrowRight, Clock, MapPin, Star } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import * as React from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+
 import {
   Carousel,
   CarouselContent,
@@ -21,7 +15,9 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
+import { MenuItemCard } from "@/components/ui/menu-item-card"
 import { Separator } from "@/components/ui/separator"
+import { VendorCard } from "@/components/ui/vendor-card"
 import { api } from "@/trpc/react"
 
 export default function HomePage() {
@@ -63,15 +59,6 @@ export default function HomePage() {
       cta: "View Packages",
     },
   ]
-
-  // Helper to format currency
-  const formatCurrency = (amount: string) => {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      maximumFractionDigits: 0,
-    }).format(parseFloat(amount))
-  }
 
   return (
     <div className='min-h-screen bg-studio-50 pb-20 font-sans text-slate-900'>
@@ -181,50 +168,7 @@ export default function HomePage() {
                     className='pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4'
                     key={item.id}
                   >
-                    <Card className='group h-full overflow-hidden rounded-2xl border-none bg-white pt-0 shadow-md ring-1 ring-slate-100 transition-all duration-300 hover:shadow-xl'>
-                      <CardHeader className='p-0'>
-                        <div className='relative aspect-[4/3] w-full overflow-hidden bg-gray-100'>
-                          <Image
-                            alt={item.itemName}
-                            className='h-full w-full object-cover transition-transform duration-500 group-hover:scale-110'
-                            height={400}
-                            onError={(e) => {
-                              // Simple fallback
-                            }}
-                            src={item.imageUrl || "/placeholder-food.jpg"}
-                            width={500}
-                          />
-                          <div className='absolute top-3 left-3'>
-                            <Badge className='bg-white/90 font-bold text-orange-600 shadow-sm backdrop-blur-sm hover:bg-white'>
-                              Recommended
-                            </Badge>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className='flex-1 space-y-3 p-5'>
-                        <div className='flex items-start justify-between'>
-                          <CardTitle className='line-clamp-1 font-bold text-lg text-slate-800 transition-colors group-hover:text-orange-600'>
-                            {item.itemName}
-                          </CardTitle>
-                          <div className='flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 font-bold text-amber-500 text-xs'>
-                            <Star className='h-3 w-3 fill-current' /> 4.8
-                          </div>
-                        </div>
-                        <div className='flex items-center gap-2 text-muted-foreground text-sm'>
-                          <Clock className='h-3.5 w-3.5' /> 45 mins
-                          <span className='text-slate-300'>•</span>
-                          <MapPin className='h-3.5 w-3.5' /> 2.1km
-                        </div>
-                        <p className='font-bold text-slate-900 text-xl'>
-                          {formatCurrency(item.unitPrice)}
-                        </p>
-                      </CardContent>
-                      <CardFooter className='p-5 pt-0'>
-                        <Button className='h-11 w-full rounded-xl bg-slate-900 font-semibold text-white shadow-lg shadow-slate-900/10 transition-colors hover:bg-orange-500'>
-                          Add to Cart
-                        </Button>
-                      </CardFooter>
-                    </Card>
+                    <MenuItemCard item={item} />
                   </CarouselItem>
                 ))}
               </CarouselContent>
@@ -242,41 +186,14 @@ export default function HomePage() {
             <h2 className='font-bold text-3xl text-slate-900 tracking-tight md:text-4xl'>
               Featured Merchants
             </h2>
-            <Button className='hidden md:flex' variant='outline'>
-              See All Merchants
+            <Button asChild className='hidden md:flex' variant='outline'>
+              <Link href='/vendor'>See All Merchants</Link>
             </Button>
           </div>
 
-          <div className='grid grid-cols-2 gap-6 md:grid-cols-4 lg:grid-cols-6'>
+          <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
             {merchants?.map((merchant) => (
-              <div
-                className='group flex cursor-pointer flex-col items-center space-y-3 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition-all hover:border-orange-100 hover:shadow-xl'
-                key={merchant.id}
-              >
-                <div className='relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-orange-50 shadow-inner ring-4 ring-white transition-transform duration-300 group-hover:scale-110'>
-                  {merchant.user?.image ? (
-                    <Image
-                      alt={merchant.businessName}
-                      className='h-full w-full object-cover'
-                      height={80}
-                      src={merchant.user.image}
-                      width={80}
-                    />
-                  ) : (
-                    <span className='font-bold text-2xl text-orange-500'>
-                      {merchant.businessName.charAt(0)}
-                    </span>
-                  )}
-                </div>
-                <div className='space-y-1 text-center'>
-                  <h3 className='font-semibold text-slate-900 transition-colors group-hover:text-orange-600'>
-                    {merchant.businessName}
-                  </h3>
-                  <p className='text-muted-foreground text-xs'>
-                    Premium Partner
-                  </p>
-                </div>
-              </div>
+              <VendorCard key={merchant.id} vendor={merchant} />
             ))}
           </div>
         </section>

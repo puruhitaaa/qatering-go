@@ -156,7 +156,13 @@ export const menuItemRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const item = await ctx.db.query.menuItem.findFirst({
         where: (m, { eq }) => eq(m.id, input.id),
-        with: { vendor: true },
+        with: {
+          vendor: {
+            with: {
+              user: true, // For vendor profile image
+            },
+          },
+        },
       })
 
       if (!item) {

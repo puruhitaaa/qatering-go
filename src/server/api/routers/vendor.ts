@@ -93,6 +93,12 @@ export const vendorRouter = createTRPCRouter({
       const items = await db.query.vendor.findMany({
         with: {
           user: true,
+          location: true,
+          menuItems: {
+            columns: {
+              id: true, // Only fetch ID to count
+            },
+          },
         },
         limit: limit + 1,
         where: (v, { and, gt, ilike }) => {
