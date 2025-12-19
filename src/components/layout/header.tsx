@@ -18,9 +18,13 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
+import { authClient } from "@/server/better-auth/client"
+import { Skeleton } from "../ui/skeleton"
 
 export function Header() {
+  const { data: session, isPending, isRefetching } = authClient.useSession()
   const [isScrolled, setIsScrolled] = React.useState(false)
+  const isLoadingAuth = isPending || isRefetching
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -60,11 +64,12 @@ export function Header() {
           <NavigationMenu className='hidden md:flex'>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <Link href='/' legacyBehavior passHref>
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                    Home
-                  </NavigationMenuLink>
-                </Link>
+                <NavigationMenuLink
+                  asChild
+                  className={navigationMenuTriggerStyle()}
+                >
+                  <Link href='/'>Home</Link>
+                </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Menu</NavigationMenuTrigger>
@@ -100,11 +105,12 @@ export function Header() {
                 </NavigationMenuContent>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <Link href='#' legacyBehavior passHref>
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                    Services
-                  </NavigationMenuLink>
-                </Link>
+                <NavigationMenuLink
+                  asChild
+                  className={navigationMenuTriggerStyle()}
+                >
+                  <Link href='#'>Services</Link>
+                </NavigationMenuLink>
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
@@ -156,15 +162,28 @@ export function Header() {
           </Button>
 
           <div className='ml-2 hidden items-center gap-3 border-gray-200 border-l pl-4 md:flex'>
-            <Button
-              className='font-semibold text-gray-600 hover:text-orange-600'
-              variant='ghost'
-            >
-              Log In
-            </Button>
-            <Button className='rounded-full bg-gray-900 text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-gray-800 hover:shadow-xl'>
-              Sign Up
-            </Button>
+            {!isLoadingAuth ? (
+              <>
+                <Button
+                  asChild
+                  className='font-semibold text-gray-600 hover:text-orange-600'
+                  variant='ghost'
+                >
+                  <Link href='/login'>Log In</Link>
+                </Button>
+                <Button
+                  asChild
+                  className='rounded-full bg-gray-900 text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-gray-800 hover:shadow-xl'
+                >
+                  <Link href='/signup'>Sign Up</Link>
+                </Button>
+              </>
+            ) : (
+              <>
+                <Skeleton className='h-8 w-20 rounded-full' />
+                <Skeleton className='h-8 w-20 rounded-full' />
+              </>
+            )}
           </div>
 
           {/* Mobile Menu */}
@@ -231,15 +250,30 @@ export function Header() {
                   <Separator />
 
                   <div className='flex flex-col gap-3'>
-                    <Button
-                      className='w-full justify-start text-base'
-                      variant='ghost'
-                    >
-                      <User className='mr-2 h-4 w-4' /> Log In
-                    </Button>
-                    <Button className='w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md'>
-                      Sign Up Now
-                    </Button>
+                    {isLoadingAuth ? (
+                      <>
+                        <Skeleton className='h-8 w-full rounded-full' />
+                        <Skeleton className='h-8 w-full rounded-full' />
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          asChild
+                          className='w-full justify-start text-base'
+                          variant='ghost'
+                        >
+                          <Link href='/login'>
+                            <User className='mr-2 h-4 w-4' /> Log In
+                          </Link>
+                        </Button>
+                        <Button
+                          asChild
+                          className='w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md'
+                        >
+                          <Link href='/signup'>Sign Up Now</Link>
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
               </SheetContent>
