@@ -8,6 +8,13 @@
       "when": 1766121000708,
       "tag": "0000_true_captain_cross",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1766121189242,
+      "tag": "0001_gifted_blink",
+      "breakpoints": true
     }
   ]
 }

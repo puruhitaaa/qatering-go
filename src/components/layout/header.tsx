@@ -3,6 +3,7 @@
 import { Bell, Menu, Search, ShoppingCart, User } from "lucide-react"
 import Link from "next/link"
 import * as React from "react"
+import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -33,6 +34,19 @@ export function Header() {
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
+
+  const handleLogout = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          toast.success("Logged out successfully")
+        },
+        onError: () => {
+          toast.error("Failed to log out")
+        },
+      },
+    })
+  }
 
   return (
     <header
@@ -163,21 +177,38 @@ export function Header() {
 
           <div className='ml-2 hidden items-center gap-3 border-gray-200 border-l pl-4 md:flex'>
             {!isLoadingAuth ? (
-              <>
-                <Button
-                  asChild
-                  className='font-semibold text-gray-600 hover:text-orange-600'
-                  variant='ghost'
-                >
-                  <Link href='/login'>Log In</Link>
-                </Button>
-                <Button
-                  asChild
-                  className='rounded-full bg-gray-900 text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-gray-800 hover:shadow-xl'
-                >
-                  <Link href='/signup'>Sign Up</Link>
-                </Button>
-              </>
+              !session ? (
+                <>
+                  <Button
+                    asChild
+                    className='font-semibold text-gray-600 hover:text-orange-600'
+                    variant='ghost'
+                  >
+                    <Link href='/login'>Log In</Link>
+                  </Button>
+                  <Button
+                    asChild
+                    className='rounded-full bg-gray-900 text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-gray-800 hover:shadow-xl'
+                  >
+                    <Link href='/signup'>Sign Up</Link>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button asChild className='text-base' variant='ghost'>
+                    <Link href='/profile'>
+                      <User className='mr-2 h-4 w-4' /> Profile
+                    </Link>
+                  </Button>
+                  <Button
+                    className='bg-destructive text-destructive-foreground shadow-md'
+                    onClick={handleLogout}
+                    type='button'
+                  >
+                    Logout
+                  </Button>
+                </>
+              )
             ) : (
               <>
                 <Skeleton className='h-8 w-20 rounded-full' />
@@ -255,7 +286,7 @@ export function Header() {
                         <Skeleton className='h-8 w-full rounded-full' />
                         <Skeleton className='h-8 w-full rounded-full' />
                       </>
-                    ) : (
+                    ) : !session ? (
                       <>
                         <Button
                           asChild
@@ -271,6 +302,25 @@ export function Header() {
                           className='w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md'
                         >
                           <Link href='/signup'>Sign Up Now</Link>
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          asChild
+                          className='w-full justify-start text-base'
+                          variant='ghost'
+                        >
+                          <Link href='/profile'>
+                            <User className='mr-2 h-4 w-4' /> Profile
+                          </Link>
+                        </Button>
+                        <Button
+                          className='w-full bg-destructive text-destructive-foreground shadow-md'
+                          onClick={handleLogout}
+                          type='button'
+                        >
+                          Logout
                         </Button>
                       </>
                     )}

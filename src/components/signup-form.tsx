@@ -61,15 +61,13 @@ export function SignupForm({
   async function onSubmit(data: SignupValues) {
     setLoading(true)
     setError(null)
-    await authClient.signUp.email(
-      {
-        email: data.email,
-        password: data.password,
-        name: data.name,
-        phoneNumber: Number(data.phoneNumber),
-        callbackURL: "/",
-      },
-      {
+    await authClient.signUp.email({
+      email: data.email,
+      password: data.password,
+      name: data.name,
+      phoneNumber: data.phoneNumber,
+      callbackURL: "/",
+      fetchOptions: {
         onSuccess: () => {
           toast.success("Account created successfully")
         },
@@ -78,8 +76,8 @@ export function SignupForm({
           setLoading(false)
           toast.error(ctx.error.message)
         },
-      }
-    )
+      },
+    })
   }
 
   return (

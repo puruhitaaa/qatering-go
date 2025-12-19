@@ -20,7 +20,7 @@ export const user = pgTable("user", {
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
   role: text("role").default("customer"),
-  phoneNumber: integer("phone_number").notNull().unique(),
+  phoneNumber: text("phone_number").notNull().unique(),
 })
 
 export const session = pgTable(

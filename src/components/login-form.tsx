@@ -50,13 +50,11 @@ export function LoginForm({
   async function onSubmit(data: LoginValues) {
     setLoading(true)
     setError(null)
-    await authClient.signIn.email(
-      {
-        email: data.email,
-        password: data.password,
-        callbackURL: "/",
-      },
-      {
+    await authClient.signIn.email({
+      email: data.email,
+      password: data.password,
+      callbackURL: "/",
+      fetchOptions: {
         onSuccess: () => {
           toast.success("Login successful")
         },
@@ -65,8 +63,8 @@ export function LoginForm({
           setLoading(false)
           toast.error(ctx.error.message)
         },
-      }
-    )
+      },
+    })
   }
 
   return (
