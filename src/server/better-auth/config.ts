@@ -23,6 +23,8 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
+    maxPasswordLength: 128,
+    minPasswordLength: 8,
   },
   databaseHooks: {
     user: {
