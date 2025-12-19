@@ -1,23 +1,45 @@
-import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { betterAuth } from "better-auth"
+import { drizzleAdapter } from "better-auth/adapters/drizzle"
 
-import { env } from "@/env";
-import { db } from "@/server/db";
+import { db } from "@/server/db"
+import { vendor } from "@/server/db/app-schema"
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
-    provider: "pg", // or "pg" or "mysql"
+    provider: "pg",
   }),
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        defaultValue: "customer",
+      },
+      phoneNumber: {
+        type: "number",
+        required: true,
+        unique: true,
+      },
+    },
+  },
   emailAndPassword: {
     enabled: true,
   },
-  socialProviders: {
-    github: {
-      clientId: env.BETTER_AUTH_GITHUB_CLIENT_ID,
-      clientSecret: env.BETTER_AUTH_GITHUB_CLIENT_SECRET,
-      redirectURI: "http://localhost:3000/api/auth/callback/github",
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          // Auto-create vendor record when user registers with 'vendor' role
+          if (user.role === "vendor") {
+            await db.insert(vendor).values({
+              userId: user.id,
+              businessName: user.name || "New Vendor",
+              status: "pending_approval",
+            })
+          }
+        },
+      },
     },
   },
-});
+})
 
-export type Session = typeof auth.$Infer.Session;
+export type Session = typeof auth.$Infer.Session
