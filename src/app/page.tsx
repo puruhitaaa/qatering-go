@@ -3,6 +3,7 @@
 import Autoplay from "embla-carousel-autoplay"
 import { ArrowRight, Clock, MapPin, Star } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 import * as React from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -24,8 +25,14 @@ import { Separator } from "@/components/ui/separator"
 import { api } from "@/trpc/react"
 
 export default function HomePage() {
-  const { data: recommendations } = api.product.getRecommendations.useQuery()
-  const { data: merchants } = api.merchant.getAll.useQuery()
+  const { data: recommendationsData } = api.menuItem.getAll.useQuery({
+    limit: 8,
+    isAvailable: true,
+  })
+  const { data: vendorsData } = api.vendor.getAll.useQuery({ limit: 6 })
+
+  const recommendations = recommendationsData?.items
+  const merchants = vendorsData?.items
 
   const plugin = React.useRef(
     Autoplay({ delay: 5000, stopOnInteraction: true })
@@ -56,6 +63,15 @@ export default function HomePage() {
       cta: "View Packages",
     },
   ]
+
+  // Helper to format currency
+  const formatCurrency = (amount: string) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      maximumFractionDigits: 0,
+    }).format(parseFloat(amount))
+  }
 
   return (
     <div className='min-h-screen bg-studio-50 pb-20 font-sans text-slate-900'>
@@ -102,10 +118,11 @@ export default function HomePage() {
                     </p>
                     <div className='flex gap-4 pt-4'>
                       <Button
+                        asChild
                         className='rounded-full bg-orange-500 px-8 py-6 font-semibold text-lg text-white shadow-lg shadow-orange-500/20 transition-all hover:-translate-y-1 hover:bg-orange-600'
                         size='lg'
                       >
-                        {slide.cta}
+                        <Link href='/menu-items'>{slide.cta}</Link>
                       </Button>
                       <Button
                         className='rounded-full border-2 border-white bg-transparent px-8 py-6 font-semibold text-lg text-white transition-all hover:bg-white hover:text-black'
@@ -140,10 +157,13 @@ export default function HomePage() {
               </p>
             </div>
             <Button
+              asChild
               className='hidden font-semibold text-orange-500 md:flex'
               variant='link'
             >
-              View All <ArrowRight className='ml-2 h-4 w-4' />
+              <Link href='/menu-items'>
+                View All <ArrowRight className='ml-2 h-4 w-4' />
+              </Link>
             </Button>
           </div>
 
@@ -161,19 +181,17 @@ export default function HomePage() {
                     className='pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4'
                     key={item.id}
                   >
-                    <Card className='group h-full overflow-hidden rounded-2xl border-none bg-white shadow-md ring-1 ring-slate-100 transition-all duration-300 hover:shadow-xl'>
+                    <Card className='group h-full overflow-hidden rounded-2xl border-none bg-white pt-0 shadow-md ring-1 ring-slate-100 transition-all duration-300 hover:shadow-xl'>
                       <CardHeader className='p-0'>
                         <div className='relative aspect-[4/3] w-full overflow-hidden bg-gray-100'>
                           <Image
-                            alt={item.name}
+                            alt={item.itemName}
                             className='h-full w-full object-cover transition-transform duration-500 group-hover:scale-110'
                             height={400}
                             onError={(e) => {
-                              // Simple fallback logic handled in UI via CSS or State if needed,
-                              // but for now keeping it simple.
-                              // Ideally would use a state variable, but direct DOM manipulation is hacky in React.
+                              // Simple fallback
                             }}
-                            src={item.image}
+                            src={item.imageUrl || "/placeholder-food.jpg"}
                             width={500}
                           />
                           <div className='absolute top-3 left-3'>
@@ -186,7 +204,7 @@ export default function HomePage() {
                       <CardContent className='flex-1 space-y-3 p-5'>
                         <div className='flex items-start justify-between'>
                           <CardTitle className='line-clamp-1 font-bold text-lg text-slate-800 transition-colors group-hover:text-orange-600'>
-                            {item.name}
+                            {item.itemName}
                           </CardTitle>
                           <div className='flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 font-bold text-amber-500 text-xs'>
                             <Star className='h-3 w-3 fill-current' /> 4.8
@@ -198,7 +216,7 @@ export default function HomePage() {
                           <MapPin className='h-3.5 w-3.5' /> 2.1km
                         </div>
                         <p className='font-bold text-slate-900 text-xl'>
-                          {item.price}
+                          {formatCurrency(item.unitPrice)}
                         </p>
                       </CardContent>
                       <CardFooter className='p-5 pt-0'>
@@ -209,8 +227,6 @@ export default function HomePage() {
                     </Card>
                   </CarouselItem>
                 ))}
-                {/* Add a skeleton or empty state if recommendations is undefined? 
-                    For now assuming data comes in eventually. */}
               </CarouselContent>
               <CarouselPrevious className='-left-4 hidden border-slate-200 bg-white text-slate-700 shadow-lg hover:border-orange-200 hover:text-orange-500 md:flex' />
               <CarouselNext className='-right-4 hidden border-slate-200 bg-white text-slate-700 shadow-lg hover:border-orange-200 hover:text-orange-500 md:flex' />
@@ -238,14 +254,23 @@ export default function HomePage() {
                 key={merchant.id}
               >
                 <div className='relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-orange-50 shadow-inner ring-4 ring-white transition-transform duration-300 group-hover:scale-110'>
-                  {/* Fallback avatar */}
-                  <span className='font-bold text-2xl text-orange-500'>
-                    {merchant.name.charAt(0)}
-                  </span>
+                  {merchant.user?.image ? (
+                    <Image
+                      alt={merchant.businessName}
+                      className='h-full w-full object-cover'
+                      height={80}
+                      src={merchant.user.image}
+                      width={80}
+                    />
+                  ) : (
+                    <span className='font-bold text-2xl text-orange-500'>
+                      {merchant.businessName.charAt(0)}
+                    </span>
+                  )}
                 </div>
                 <div className='space-y-1 text-center'>
                   <h3 className='font-semibold text-slate-900 transition-colors group-hover:text-orange-600'>
-                    {merchant.name}
+                    {merchant.businessName}
                   </h3>
                   <p className='text-muted-foreground text-xs'>
                     Premium Partner

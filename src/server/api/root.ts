@@ -1,6 +1,7 @@
-import { merchantRouter } from "@/server/api/routers/merchant"
+import { menuItemRouter } from "@/server/api/routers/menuItem"
+import { orderRouter } from "@/server/api/routers/order"
 import { postRouter } from "@/server/api/routers/post"
-import { productRouter } from "@/server/api/routers/product"
+import { vendorRouter } from "@/server/api/routers/vendor"
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc"
 
 /**
@@ -10,8 +11,9 @@ import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc"
  */
 export const appRouter = createTRPCRouter({
   post: postRouter,
-  merchant: merchantRouter,
-  product: productRouter,
+  vendor: vendorRouter,
+  menuItem: menuItemRouter,
+  order: orderRouter,
 })
 
 // export type definition of API

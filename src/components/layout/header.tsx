@@ -1,19 +1,16 @@
 "use client"
 
-import { Bell, Menu, Search, ShoppingCart, User } from "lucide-react"
+import { Bell, Menu, Search, User } from "lucide-react"
 import Link from "next/link"
 import * as React from "react"
 import { toast } from "sonner"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
   NavigationMenu,
-  NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
 import { Separator } from "@/components/ui/separator"
@@ -82,48 +79,7 @@ export function Header() {
                   asChild
                   className={navigationMenuTriggerStyle()}
                 >
-                  <Link href='/'>Home</Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger>Menu</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className='grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]'>
-                    <li className='row-span-3'>
-                      <NavigationMenuLink asChild>
-                        <a
-                          className='flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-orange-500 to-amber-600 p-6 no-underline outline-none focus:shadow-md'
-                          href='/'
-                        >
-                          <div className='mt-4 mb-2 font-bold text-lg text-white'>
-                            Featured Menu
-                          </div>
-                          <p className='font-medium text-sm text-white/90 leading-tight'>
-                            Explore our chef's recommended dishes for this
-                            season.
-                          </p>
-                        </a>
-                      </NavigationMenuLink>
-                    </li>
-                    <ListItem href='#' title='Tumpeng Mini'>
-                      Traditional cone-shaped rice with assortment of dishes.
-                    </ListItem>
-                    <ListItem href='#' title='Bento Box'>
-                      Premium Japanese-style lunch boxes for corporate meetings.
-                    </ListItem>
-                    <ListItem href='#' title='Buffet Packages'>
-                      Full-service buffet setup for large gatherings and
-                      weddings.
-                    </ListItem>
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuLink
-                  asChild
-                  className={navigationMenuTriggerStyle()}
-                >
-                  <Link href='#'>Services</Link>
+                  <Link href='/menu-items'>Menu</Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
             </NavigationMenuList>
@@ -161,18 +117,6 @@ export function Header() {
           >
             <Bell className='h-5 w-5' />
             <span className='absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white' />
-          </Button>
-
-          <Button
-            aria-label='Cart'
-            className='relative text-gray-600 transition-colors hover:bg-orange-50 hover:text-orange-600'
-            size='icon'
-            variant='ghost'
-          >
-            <ShoppingCart className='h-5 w-5' />
-            <Badge className='absolute -top-1 -right-1 flex h-5 w-5 animate-pulse items-center justify-center rounded-full bg-orange-500 p-0 text-[10px] text-white'>
-              3
-            </Badge>
           </Button>
 
           <div className='ml-2 hidden items-center gap-3 border-gray-200 border-l pl-4 md:flex'>
